@@ -3,6 +3,7 @@ package flip_regexp
 import (
 	"strconv"
 	"math/rand"
+	"time"
 )
 
 const (
@@ -37,6 +38,7 @@ func (b *Builder) Render() (string, error) {
 	b.Result = ""
 	b.Position = 0
 	escape := false
+	rand.Seed(time.Now().UnixNano())
 
 	for b.Position < len(b.Pattern) {
 		letter := b.getCurrentSymbol()
