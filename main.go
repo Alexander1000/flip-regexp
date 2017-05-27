@@ -1,32 +1,38 @@
 package flip_regexp
 
 import (
-	"strconv"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
 const (
 	WORD_DIGITS = "qwertyuiopasdfghjklzxcvbnm0123456789 "
 
-	TOKEN_BRACKET_OPEN    = `[`
-	TOKEN_BRACKET_CLOSE   = `]`
-	TOKEN_C_BRACKET_OPEN  = `(`
-	TOKEN_C_BRACKET_CLOSE = `)`
-	TOKEN_PIPE            = `|`
-	TOKEN_QUESTION        = `?`
-	TOKEN_PLUS            = `+`
-	TOKEN_MINUS           = `-`
-	TOKEN_ESCAPE          = `\`
+	tokenEscape           = byte(0x5C)  // \
+	tokenBracketOpen      = byte(0x5B)  // [
+	tokenBracketClose     = byte(0x5D)  // ]
+	tokenParenthesisOpen  = byte(0x28)  // (
+	tokenParenthesisClose = byte(0x29)  // )
+	tokenBraceOpen        = byte(0x7B)  // {
+	tokenBraceClose       = byte(0x7D)  // }
+	tokenPipe             = byte(0x7C)  // |
+	tokenDot              = byte(0x2E)  // .
+	tokenQuestion         = byte(0x3F)  // ?
+	tokenDoubleDot        = byte(0x3A)  // :
+	tokenPlus             = byte(0x2B)  // +
+	tokenHyphen           = byte(0x2D)  // -
+	tokenComma            = byte(0x2C)  // ,
+	tokenAsterisk         = byte(0x2A)  // *
 )
 
 type Builder struct {
-	Pattern  string
+	Pattern  []byte
 	Position int
-	Result   string
+	Result   []byte
 }
 
-func NewBuilder(pattern string) *Builder {
+func NewBuilder(pattern []byte) *Builder {
 	return &Builder{Pattern: pattern}
 }
 
@@ -34,31 +40,39 @@ func (b *Builder) getCurrentSymbol() byte {
 	return b.Pattern[b.Position]
 }
 
-func (b *Builder) Render() (string, error) {
-	b.Result = ""
+func (b *Builder) randInt(min, max int) int {
+	if min == max {
+		return min
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	return min + rand.Intn(max-min)
+}
+
+func (b *Builder) Render() ([]byte, error) {
+	b.Result = make([]byte, 10)
 	b.Position = 0
 	escape := false
-	rand.Seed(time.Now().UnixNano())
 
 	for b.Position < len(b.Pattern) {
 		letter := b.getCurrentSymbol()
 
-		if !escape && letter == []byte(TOKEN_ESCAPE)[0] {
+		if !escape && letter == tokenEscape {
 			escape = true
 			b.Position++
 		} else if escape {
 			escape = false
-			b.Result += string(letter)
+			b.Result = append(b.Result, letter)
 			b.Position++
-		} else if letter == []byte(TOKEN_BRACKET_OPEN)[0] {
+		} else if letter == tokenBracketOpen {
 			b.Position++
 			b.parseInBracket()
 			continue
-		} else if letter == []byte(TOKEN_C_BRACKET_OPEN)[0] {
+		} else if letter == tokenParenthesisOpen {
 			b.Position++
-			b.parseInCBracket()
+			b.parseInBrace()
 		} else {
-			b.Result += string(letter)
+			b.Result = append(b.Result, letter)
 			b.Position++
 		}
 	}
@@ -66,40 +80,40 @@ func (b *Builder) Render() (string, error) {
 	return b.Result, nil
 }
 
-func (b *Builder) getIntervalLetter(begin byte, end byte) string {
-	str := ""
+func (b *Builder) getIntervalLetter(begin byte, end byte) []byte {
+	var str []byte
 	curSymbol := begin
 
 	for curSymbol <= end {
-		str += string(curSymbol)
+		str = append(str, curSymbol)
 		curSymbol++
 	}
 
 	return str
 }
 
-func (b *Builder) parseInCBracket() {
-	var words []string
-	str := ""
+func (b *Builder) parseInBrace() {
+	var words [][]byte
+	var str []byte
 
 	for b.Position < len(b.Pattern) {
 		letter := b.getCurrentSymbol()
 		b.Position++
 
 		if b.isLetter(letter) {
-			str += string(letter)
-		} else if letter == []byte(TOKEN_PIPE)[0] {
+			str = append(str, letter)
+		} else if letter == tokenPipe {
 			words = append(words, str)
-			str = ""
-		} else if letter == []byte(TOKEN_C_BRACKET_CLOSE)[0] {
+			str = []byte{}
+		} else if letter == tokenParenthesisClose {
 			if len(str) > 0 {
 				words = append(words, str)
-				str = ""
+				str = []byte{}
 			}
 
 			break
 		} else {
-			str += string(letter)
+			str = append(str, letter)
 		}
 	}
 
@@ -110,10 +124,10 @@ func (b *Builder) parseInCBracket() {
 	if b.Position < len(b.Pattern) {
 		letter := b.getCurrentSymbol()
 
-		if letter == []byte(TOKEN_QUESTION)[0] {
+		if letter == tokenQuestion {
 			b.Position++
-			if rand.Intn(2) == 1 {
-				b.Result += words[rand.Intn(len(words))]
+			if b.randInt(0, 2) == 1 {
+				b.Result = append(b.Result, words[b.randInt(0, len(words))]...)
 				return
 			} else {
 				return
@@ -121,12 +135,12 @@ func (b *Builder) parseInCBracket() {
 		}
 	}
 
-	b.Result += words[rand.Intn(len(words))]
+	b.Result = append(b.Result, words[b.randInt(0, len(words))]...)
 }
 
 // генерация строки для шаблона: []{,}
 func (b *Builder) parseInBracket() {
-	alfa := ""
+	var abc []byte
 	var prev byte
 	interval := false
 
@@ -136,27 +150,26 @@ func (b *Builder) parseInBracket() {
 
 		if b.isLetter(letter) {
 			if !interval {
-				alfa += string(letter)
+				abc = append(abc, letter)
 				prev = letter
 			} else {
-				// prev = letter
-				alfa += b.getIntervalLetter(prev+1, letter)
+				abc = append(abc, b.getIntervalLetter(prev+1, letter)...)
 				interval = false
 			}
-		} else if letter == []byte(TOKEN_MINUS)[0] {
+		} else if letter == tokenHyphen {
 			if interval {
-				alfa += "-"
+				abc = append(abc, tokenHyphen)
 			} else {
 				interval = true
 			}
-		} else if letter == []byte(TOKEN_BRACKET_CLOSE)[0] {
+		} else if letter == tokenBracketClose {
 			interval = false
 			break
 		}
 	}
 
 	// var strMin, strMax, str string
-	var str string
+	var str []byte
 	min := 1
 	max := 1
 	var size []int
@@ -165,16 +178,16 @@ func (b *Builder) parseInBracket() {
 	for b.Position < len(b.Pattern) {
 		letter := b.getCurrentSymbol()
 
-		if letter == []byte(`{`)[0] {
+		if letter == tokenBraceOpen {
 			bracket = true
-		} else if letter == []byte(`}`)[0] {
+		} else if letter == tokenBraceClose {
 			bracket = false
 		} else if bracket && b.isDigit(letter) {
-			str += string(letter)
-		} else if bracket && letter == []byte(`,`)[0] {
-			tSize, _ := strconv.Atoi(str)
+			str = append(str, letter)
+		} else if bracket && letter == tokenComma {
+			tSize, _ := strconv.Atoi(string(str))
 			size = append(size, tSize)
-			str = ""
+			str = []byte{}
 		} else {
 			break
 		}
@@ -183,9 +196,9 @@ func (b *Builder) parseInBracket() {
 	}
 
 	if len(str) > 0 {
-		tSize, _ := strconv.Atoi(str)
+		tSize, _ := strconv.Atoi(string(str))
 		size = append(size, tSize)
-		str = ""
+		str = []byte{}
 	}
 
 	if len(size) == 1 {
@@ -200,14 +213,9 @@ func (b *Builder) parseInBracket() {
 	}
 
 	var length int
+	length = b.randInt(min, max)
 
-	if min != max {
-		length = min + rand.Intn(max-min)
-	} else {
-		length = min
-	}
-
-	b.Result += b.randomString(length, alfa)
+	b.Result = append(b.Result, b.randomString(length, abc)...)
 }
 
 func (b *Builder) isDigit(letter byte) bool {
@@ -218,22 +226,21 @@ func (b *Builder) isLetter(letter byte) bool {
 	return (letter >= []byte(`a`)[0] && letter <= []byte(`z`)[0]) || (letter >= []byte(`A`)[0] && letter <= []byte(`Z`)[0]) || b.isDigit(letter)
 }
 
-func (b *Builder) randomString(length int, alpha string) string {
-	str := ""
+func (b *Builder) randomString(length int, abc []byte) []byte {
+	var str []byte
 	i := 0
 
-	if alpha == "" {
-		alpha = WORD_DIGITS
+	if len(abc) == 0 {
+		abc = []byte(WORD_DIGITS)
 	}
 
-	size := len(alpha)
+	size := len(abc)
 
 	for i < length {
-		num := rand.Intn(size)
-		str += string(alpha[num])
+		num := b.randInt(0, size)
+		str = append(str, abc[num])
 		i++
 	}
 
 	return str
 }
-
