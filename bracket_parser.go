@@ -1,18 +1,24 @@
 package flip_regexp
 
-import "strconv"
+import (
+	"strconv"
+)
 
 // генерация строки для шаблона: []{,}
 func (b *Builder) parseInBracket() {
 	var abc []byte
 	var prev byte
 	interval := false
+	firstChar := true
+	negative := false
 
 	for b.Position < len(b.Pattern) {
 		letter := b.getCurrentSymbol()
 		b.Position++
 
-		if b.isLetter(letter) {
+		if letter == tokenCircumflex && firstChar {
+			negative = true
+		} else if b.isLetter(letter) {
 			if !interval {
 				abc = append(abc, letter)
 				prev = letter
@@ -30,6 +36,8 @@ func (b *Builder) parseInBracket() {
 			interval = false
 			break
 		}
+
+		firstChar = false
 	}
 
 	// var strMin, strMax, str string
@@ -79,5 +87,41 @@ func (b *Builder) parseInBracket() {
 	var length int
 	length = b.randInt(min, max)
 
-	b.Result = append(b.Result, b.randomString(length, abc)...)
+	if length > 0 {
+		if negative {
+			i := letterMinChar
+			lengthAntiSlice := int(letterMaxChar - letterMinChar) - len(abc)
+
+			if lengthAntiSlice <= 0 {
+				return
+			}
+
+			antiAbc := make([]byte, lengthAntiSlice)
+
+			for i <= letterMaxChar || len(antiAbc) < lengthAntiSlice {
+				exists := false
+
+				for _, letter := range abc {
+					if letter == i {
+						exists = true
+						break
+					}
+				}
+
+				if !exists {
+					antiAbc = append(antiAbc, i)
+				}
+
+				i++
+			}
+
+			if len(antiAbc) > 0 {
+				abc = antiAbc
+			} else {
+				return
+			}
+		}
+
+		b.Result = append(b.Result, b.randomString(length, abc)...)
+	}
 }

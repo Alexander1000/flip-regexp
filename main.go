@@ -30,6 +30,9 @@ const (
 	letterLowerZ = byte(0x7A) // z
 	letterUpperA = byte(0x41) // A
 	letterUpperZ = byte(0x5A) // Z
+
+	letterMinChar = byte(0x20)
+	letterMaxChar = byte(0x7E)
 )
 
 type Builder struct {
