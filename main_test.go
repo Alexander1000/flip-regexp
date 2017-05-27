@@ -33,6 +33,8 @@ func TestRegexp_SetPatterns_Success(t *testing.T) {
 		`(status|very|important)`,
 		`hello (status|very|important) and (man|woman)? test`,
 		"[A-F]{3}hellow [^0-9a-zA-Z]{7} moto",
+		"[a-z]+",
+		"hello [alexander]? it is your [qwerty90]* name?",
 	}
 
 	for _, pattern := range patternSet {
