@@ -7,8 +7,6 @@ import (
 )
 
 const (
-	WORD_DIGITS = "qwertyuiopasdfghjklzxcvbnm0123456789 "
-
 	tokenEscape           = byte(0x5C)  // \
 	tokenBracketOpen      = byte(0x5B)  // [
 	tokenBracketClose     = byte(0x5D)  // ]
@@ -239,7 +237,9 @@ func (b *Builder) randomString(length int, abc []byte) []byte {
 	i := 0
 
 	if len(abc) == 0 {
-		abc = []byte(WORD_DIGITS)
+		abc = append(abc, b.getIntervalLetter(letterLowerA, letterLowerZ)...)
+		abc = append(abc, b.getIntervalLetter(letterUpperA, letterUpperZ)...)
+		abc = append(abc, b.getIntervalLetter(letterDigit0, letterDigit9)...)
 	}
 
 	size := len(abc)
