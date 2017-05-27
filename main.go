@@ -6,22 +6,22 @@ import (
 )
 
 const (
-	tokenEscape           = byte(0x5C)  // \
-	tokenBracketOpen      = byte(0x5B)  // [
-	tokenBracketClose     = byte(0x5D)  // ]
-	tokenParenthesisOpen  = byte(0x28)  // (
-	tokenParenthesisClose = byte(0x29)  // )
-	tokenBraceOpen        = byte(0x7B)  // {
-	tokenBraceClose       = byte(0x7D)  // }
-	tokenPipe             = byte(0x7C)  // |
-	tokenDot              = byte(0x2E)  // .
-	tokenQuestion         = byte(0x3F)  // ?
-	tokenDoubleDot        = byte(0x3A)  // :
-	tokenPlus             = byte(0x2B)  // +
-	tokenHyphen           = byte(0x2D)  // -
-	tokenComma            = byte(0x2C)  // ,
-	tokenAsterisk         = byte(0x2A)  // *
-	tokenCircumflex       = byte(0x5E)  // ^
+	tokenEscape           = byte(0x5C) // \
+	tokenBracketOpen      = byte(0x5B) // [
+	tokenBracketClose     = byte(0x5D) // ]
+	tokenParenthesisOpen  = byte(0x28) // (
+	tokenParenthesisClose = byte(0x29) // )
+	tokenBraceOpen        = byte(0x7B) // {
+	tokenBraceClose       = byte(0x7D) // }
+	tokenPipe             = byte(0x7C) // |
+	tokenDot              = byte(0x2E) // .
+	tokenQuestion         = byte(0x3F) // ?
+	tokenDoubleDot        = byte(0x3A) // :
+	tokenPlus             = byte(0x2B) // +
+	tokenHyphen           = byte(0x2D) // -
+	tokenComma            = byte(0x2C) // ,
+	tokenAsterisk         = byte(0x2A) // *
+	tokenCircumflex       = byte(0x5E) // ^
 
 	letterDigit0 = byte(0x30) // 0
 	letterDigit9 = byte(0x39) // 9
@@ -64,6 +64,7 @@ func (b *Builder) Render() ([]byte, error) {
 	b.Result = make([]byte, 10)
 	b.Position = 0
 	escape := false
+	var prev byte
 
 	for b.Position < len(b.Pattern) {
 		letter := b.getCurrentSymbol()
@@ -73,19 +74,39 @@ func (b *Builder) Render() ([]byte, error) {
 			b.Position++
 		} else if escape {
 			escape = false
-			b.Result = append(b.Result, letter)
+			if prev != 0 {
+				b.Result = append(b.Result, prev)
+			}
+			prev = letter
 			b.Position++
-		} else if letter == tokenBracketOpen {
+		} else if letter == tokenQuestion {
+			// question = true
+			if b.randInt(0, 2) == 1 {
+				b.Result = append(b.Result, prev)
+			}
 			b.Position++
-			b.parseInBracket()
-			continue
-		} else if letter == tokenParenthesisOpen {
-			b.Position++
-			b.parseInBrace()
+			prev = 0
 		} else {
-			b.Result = append(b.Result, letter)
-			b.Position++
+			if prev != 0 {
+				b.Result = append(b.Result, prev)
+				prev = 0
+			}
+
+			if letter == tokenBracketOpen {
+				b.Position++
+				b.parseInBracket()
+			} else if letter == tokenParenthesisOpen {
+				b.Position++
+				b.parseInBrace()
+			} else {
+				prev = letter
+				b.Position++
+			}
 		}
+	}
+
+	if prev != 0 {
+		b.Result = append(b.Result, prev)
 	}
 
 	return b.Result, nil

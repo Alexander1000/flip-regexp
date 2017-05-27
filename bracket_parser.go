@@ -119,7 +119,7 @@ func (b *Builder) parseInBracket() {
 
 	if negative {
 		i := letterMinChar
-		lengthAntiSlice := int(letterMaxChar - letterMinChar) - len(abc)
+		lengthAntiSlice := int(letterMaxChar-letterMinChar) - len(abc)
 
 		if lengthAntiSlice <= 0 {
 			return
