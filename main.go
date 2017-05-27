@@ -24,6 +24,14 @@ const (
 	tokenHyphen           = byte(0x2D)  // -
 	tokenComma            = byte(0x2C)  // ,
 	tokenAsterisk         = byte(0x2A)  // *
+
+	letterDigit0 = byte(0x30) // 0
+	letterDigit9 = byte(0x39) // 9
+
+	letterLowerA = byte(0x61) // a
+	letterLowerZ = byte(0x7A) // z
+	letterUpperA = byte(0x41) // A
+	letterUpperZ = byte(0x5A) // Z
 )
 
 type Builder struct {
@@ -219,11 +227,11 @@ func (b *Builder) parseInBracket() {
 }
 
 func (b *Builder) isDigit(letter byte) bool {
-	return (letter >= []byte(`0`)[0] && letter <= []byte(`9`)[0])
+	return (letter >= letterDigit0 && letter <= letterDigit9)
 }
 
 func (b *Builder) isLetter(letter byte) bool {
-	return (letter >= []byte(`a`)[0] && letter <= []byte(`z`)[0]) || (letter >= []byte(`A`)[0] && letter <= []byte(`Z`)[0]) || b.isDigit(letter)
+	return (letter >= letterLowerA && letter <= letterLowerZ) || (letter >= letterUpperA && letter <= letterUpperZ) || b.isDigit(letter)
 }
 
 func (b *Builder) randomString(length int, abc []byte) []byte {
