@@ -15,10 +15,10 @@ import (
 )
 
 func main() {
-    var str string
+    var str []byte
     fmt.Println("Hello world")
 
-    flip := flip_regexp.NewBuilder("[0-9]{5,9}")
+    flip := flip_regexp.NewBuilder([]byte("[0-9]{5,9}"))
 
     str, err := flip.Render()
 
