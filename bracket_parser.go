@@ -40,26 +40,40 @@ func (b *Builder) parseInBracket() {
 		firstChar = false
 	}
 
-	// var strMin, strMax, str string
 	var str []byte
 	min := 1
 	max := 1
 	var size []int
-	var bracket bool
+	var bracket, plus, asterisk, question bool
 
+	// сканируем потенциально возможные управляющие конструкции
 	for b.Position < len(b.Pattern) {
 		letter := b.getCurrentSymbol()
 
-		if letter == tokenBraceOpen {
+		if !bracket && letter == tokenBraceOpen {
 			bracket = true
-		} else if letter == tokenBraceClose {
+		} else if bracket && letter == tokenBraceClose {
 			bracket = false
+			b.Position++
+			break
 		} else if bracket && b.isDigit(letter) {
 			str = append(str, letter)
 		} else if bracket && letter == tokenComma {
 			tSize, _ := strconv.Atoi(string(str))
 			size = append(size, tSize)
 			str = []byte{}
+		} else if !bracket && letter == tokenPlus {
+			plus = true
+			b.Position++
+			break
+		} else if !bracket && letter == tokenAsterisk {
+			asterisk = true
+			b.Position++
+			break
+		} else if !bracket && letter == tokenQuestion {
+			question = true
+			b.Position++
+			break
 		} else {
 			break
 		}
@@ -73,55 +87,69 @@ func (b *Builder) parseInBracket() {
 		str = []byte{}
 	}
 
-	if len(size) == 1 {
-		min = size[0]
-		max = size[0]
-	} else if len(size) == 2 {
-		min = size[0]
-		max = size[1]
-	} else {
+	if plus {
 		min = 1
-		max = 1
+		max = randomMax
+	}
+
+	if asterisk {
+		min = 1
+		max = randomMax
+	}
+
+	if !plus && !asterisk {
+		if len(size) == 1 {
+			min = size[0]
+			max = size[0]
+		} else if len(size) == 2 {
+			min = size[0]
+			max = size[1]
+		} else {
+			min = 1
+			max = 1
+		}
 	}
 
 	var length int
 	length = b.randInt(min, max)
 
-	if length > 0 {
-		if negative {
-			i := letterMinChar
-			lengthAntiSlice := int(letterMaxChar - letterMinChar) - len(abc)
+	if length <= 0 || (question && b.randInt(0, 2) == 1) {
+		return
+	}
 
-			if lengthAntiSlice <= 0 {
-				return
-			}
+	if negative {
+		i := letterMinChar
+		lengthAntiSlice := int(letterMaxChar - letterMinChar) - len(abc)
 
-			antiAbc := make([]byte, lengthAntiSlice)
-
-			for i <= letterMaxChar || len(antiAbc) < lengthAntiSlice {
-				exists := false
-
-				for _, letter := range abc {
-					if letter == i {
-						exists = true
-						break
-					}
-				}
-
-				if !exists {
-					antiAbc = append(antiAbc, i)
-				}
-
-				i++
-			}
-
-			if len(antiAbc) > 0 {
-				abc = antiAbc
-			} else {
-				return
-			}
+		if lengthAntiSlice <= 0 {
+			return
 		}
 
-		b.Result = append(b.Result, b.randomString(length, abc)...)
+		antiAbc := make([]byte, lengthAntiSlice)
+
+		for i <= letterMaxChar || len(antiAbc) < lengthAntiSlice {
+			exists := false
+
+			for _, letter := range abc {
+				if letter == i {
+					exists = true
+					break
+				}
+			}
+
+			if !exists {
+				antiAbc = append(antiAbc, i)
+			}
+
+			i++
+		}
+
+		if len(antiAbc) > 0 {
+			abc = antiAbc
+		} else {
+			return
+		}
 	}
+
+	b.Result = append(b.Result, b.randomString(length, abc)...)
 }

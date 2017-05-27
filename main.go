@@ -33,6 +33,8 @@ const (
 
 	letterMinChar = byte(0x20)
 	letterMaxChar = byte(0x7E)
+
+	randomMax = 16
 )
 
 type Builder struct {
