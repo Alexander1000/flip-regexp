@@ -36,6 +36,7 @@ func TestRegexp_SetPatterns_Success(t *testing.T) {
 		"[a-z]+",
 		"hello [alexander]? it is your [qwerty90]* name?",
 		"(it is )?word\\??",
+		"[orange]* and [banana]+",
 	}
 
 	for _, pattern := range patternSet {

@@ -80,12 +80,28 @@ func (b *Builder) Render() ([]byte, error) {
 			prev = letter
 			b.Position++
 		} else if letter == tokenQuestion {
-			// question = true
 			if b.randInt(0, 2) == 1 {
 				b.Result = append(b.Result, prev)
 			}
 			b.Position++
 			prev = 0
+		} else if letter == tokenAsterisk {
+			// todo: it is need?
+			if prev != 0 {
+				length := b.randInt(0, randomMax)
+				if length > 0 {
+					b.Result = append(b.Result, b.repeat(prev, length)...)
+				}
+			}
+			prev = 0
+			b.Position++
+		} else if letter == tokenPlus {
+			// todo: it is need?
+			if prev != 0 {
+				b.Result = append(b.Result, b.repeat(prev, b.randInt(1, randomMax))...)
+			}
+			prev = 0
+			b.Position++
 		} else {
 			if prev != 0 {
 				b.Result = append(b.Result, prev)
@@ -110,6 +126,19 @@ func (b *Builder) Render() ([]byte, error) {
 	}
 
 	return b.Result, nil
+}
+
+// todo: need make optimisation
+func (b *Builder) repeat(char byte, length int) []byte {
+	buffer := make([]byte, length)
+	i := 0
+
+	for i < length {
+		buffer = append(buffer, char)
+		i++
+	}
+
+	return buffer
 }
 
 func (b *Builder) getIntervalLetter(begin byte, end byte) []byte {
