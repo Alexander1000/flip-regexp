@@ -6,22 +6,7 @@ import (
 )
 
 const (
-	tokenEscape           = byte(0x5C) // \
-	tokenBracketOpen      = byte(0x5B) // [
-	tokenBracketClose     = byte(0x5D) // ]
-	tokenParenthesisOpen  = byte(0x28) // (
-	tokenParenthesisClose = byte(0x29) // )
-	tokenBraceOpen        = byte(0x7B) // {
-	tokenBraceClose       = byte(0x7D) // }
-	tokenPipe             = byte(0x7C) // |
-	tokenDot              = byte(0x2E) // .
-	tokenQuestion         = byte(0x3F) // ?
-	tokenDoubleDot        = byte(0x3A) // :
-	tokenPlus             = byte(0x2B) // +
-	tokenHyphen           = byte(0x2D) // -
-	tokenComma            = byte(0x2C) // ,
-	tokenAsterisk         = byte(0x2A) // *
-	tokenCircumflex       = byte(0x5E) // ^
+
 
 	letterDigit0 = byte(0x30) // 0
 	letterDigit9 = byte(0x39) // 9
@@ -41,14 +26,11 @@ type Builder struct {
 	Pattern  []byte
 	Position int
 	Result   []byte
+	ContextParser  int
 }
 
 func NewBuilder(pattern []byte) *Builder {
-	return &Builder{Pattern: pattern}
-}
-
-func (b *Builder) getCurrentSymbol() byte {
-	return b.Pattern[b.Position]
+	return &Builder{Pattern: pattern, Position: 0, ContextParser: mainContext}
 }
 
 func (b *Builder) randInt(min, max int) int {
@@ -62,7 +44,6 @@ func (b *Builder) randInt(min, max int) int {
 
 func (b *Builder) Render() ([]byte, error) {
 	b.Result = make([]byte, 10)
-	b.Position = 0
 	escape := false
 	var prev byte
 
@@ -197,14 +178,6 @@ func (b *Builder) parseInBrace() {
 	}
 
 	b.Result = append(b.Result, words[b.randInt(0, len(words))]...)
-}
-
-func (b *Builder) isDigit(letter byte) bool {
-	return (letter >= letterDigit0 && letter <= letterDigit9)
-}
-
-func (b *Builder) isLetter(letter byte) bool {
-	return (letter >= letterLowerA && letter <= letterLowerZ) || (letter >= letterUpperA && letter <= letterUpperZ) || b.isDigit(letter)
 }
 
 func (b *Builder) randomString(length int, abc []byte) []byte {
