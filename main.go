@@ -6,8 +6,6 @@ import (
 )
 
 const (
-
-
 	letterDigit0 = byte(0x30) // 0
 	letterDigit9 = byte(0x39) // 9
 
@@ -23,10 +21,10 @@ const (
 )
 
 type Builder struct {
-	Pattern  []byte
-	Position int
-	Result   []byte
-	ContextParser  int
+	Pattern       []byte
+	Position      int
+	Result        []byte
+	ContextParser int
 }
 
 func NewBuilder(pattern []byte) *Builder {

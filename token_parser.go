@@ -21,27 +21,28 @@ const (
 	tokenCircumflex       = byte(0x5E) // ^
 
 	tokenDigit = byte(0x64) // d
-	tokenWord = byte(0x77) // w
+	tokenWord  = byte(0x77) // w
 	tokenSpace = byte(0x73) // s
 
 	tokenNotDigit = byte(0x44) // D
-	tokenNotWord = byte(0x57) // W
+	tokenNotWord  = byte(0x57) // W
 	tokenNotSpace = byte(0x53) // S
 
-	typeInvalid = 0
-	typeLetter = 1
-	typeBracket = 2
-	typeQuantifier = 3
-	typeAlias = 4
+	typeInvalid      = 0
+	typeLetter       = 1
+	typeBracketOpen  = 2
+	typeBracketClose = 3
+	typeQuantifier   = 4
+	typeAlias        = 5
 )
 
 type Token struct {
 	Length int
 	Stream []byte
-	Type int
+	Type   int
 }
 
-func (b * Builder) getNextToken() (*Token, error) {
+func (b *Builder) getNextToken() (*Token, error) {
 	if b.ContextParser == mainContext {
 		return b.getNextTokenInMainContext()
 	}
@@ -79,7 +80,7 @@ func (b *Builder) getNextTokenInMainContext() (*Token, error) {
 			break
 		} else if letter == tokenBraceOpen || letter == tokenBracketOpen || letter == tokenParenthesisOpen {
 			buffer = append(buffer, letter)
-			token.Type = typeBracket
+			token.Type = typeBracketOpen
 		} else {
 			buffer = append(buffer, letter)
 			token.Type = typeLetter
@@ -97,7 +98,7 @@ func (b *Builder) isAlias(letter byte) bool {
 }
 
 func (b *Builder) getSymbolByRelativeOffset(position int) byte {
-	return b.Pattern[b.Position + position]
+	return b.Pattern[b.Position+position]
 }
 
 func (b *Builder) getCurrentSymbol() byte {
