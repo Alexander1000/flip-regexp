@@ -44,8 +44,30 @@ func (b *Builder) Render() ([]byte, error) {
 	b.Result = make([]byte, 10)
 	escape := false
 	var prev byte
+	// var curToken, prevToken *Token
+	// var err error
 
 	for b.Position < len(b.Pattern) {
+		/*
+			curToken, err = b.getNextToken()
+
+			if err != nil {
+				return nil, err
+			}
+
+			if curToken.Type == typeLetter {
+				if prevToken != nil {
+					b.Result = append(b.Result, prevToken.Stream...)
+				}
+				prevToken = curToken
+				b.Position += curToken.Length
+			} else if curToken.Type == typeQuantifier {
+				// todo quantifier logics
+			} else if curToken.Type == typeBracketOpen {
+				// todo bracket open
+			}
+		*/
+
 		letter := b.getCurrentSymbol()
 
 		if !escape && letter == tokenEscape {

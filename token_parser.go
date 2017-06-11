@@ -52,44 +52,40 @@ func (b *Builder) getNextToken() (*Token, error) {
 
 func (b *Builder) getNextTokenInMainContext() (*Token, error) {
 	token := Token{Type: typeInvalid, Length: 0}
+	token.Stream = make([]byte, 1)
 	curPosition := b.Position
-	buffer := make([]byte, 1)
 	escape := false
-	i := 0
 
 	for curPosition < len(b.Pattern) {
-		letter := b.getSymbolByRelativeOffset(i)
+		letter := b.getSymbolByRelativeOffset(token.Length)
 		curPosition++
-		i++
+		token.Length++
 
 		if !escape && letter == tokenEscape {
 			escape = true
-			buffer = append(buffer, letter)
 		} else if escape {
 			if b.isAlias(letter) {
-				buffer = append(buffer, letter)
 				token.Type = typeAlias
 			} else {
-				buffer = append(buffer, letter)
 				token.Type = typeLetter
 			}
+
+			token.Stream = append(token.Stream, letter)
 			break
 		} else if b.isQuantifier(letter) {
 			token.Type = typeQuantifier
-			buffer = append(buffer, letter)
+			token.Stream = append(token.Stream, letter)
 			break
 		} else if letter == tokenBraceOpen || letter == tokenBracketOpen || letter == tokenParenthesisOpen {
-			buffer = append(buffer, letter)
 			token.Type = typeBracketOpen
+			token.Stream = append(token.Stream, letter)
 		} else {
-			buffer = append(buffer, letter)
+			token.Stream = append(token.Stream, letter)
 			token.Type = typeLetter
 			break
 		}
 	}
 
-	token.Stream = buffer
-	token.Length = i
 	return &token, nil
 }
 
