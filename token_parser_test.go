@@ -4,8 +4,8 @@ import (
 	"testing"
 )
 
-func TestMainContextTokenParser_Success(t *testing.T) {
-	b := NewBuilder([]byte("[fd]"))
+func TestMainContextTokenParser_OpenBracketToken_Success(t *testing.T) {
+	b := NewBuilder([]byte("[qwerty]"))
 	token, err := b.getNextTokenInMainContext()
 
 	if err != nil {
@@ -13,11 +13,11 @@ func TestMainContextTokenParser_Success(t *testing.T) {
 	}
 
 	if token.Type != typeBracketOpen {
-		t.Fatalf("Expected bracket open, given: %v", token.Type)
+		t.Fatalf("Expected bracket open, given: %d", token.Type)
 	}
 
 	if token.Length != 1 {
-		t.Fatalf("Expected length 1, got: %v", token.Length)
+		t.Fatalf("Expected length 1, got: %d", token.Length)
 	}
 
 	if token.Stream[0] != tokenBracketOpen {
@@ -25,3 +25,23 @@ func TestMainContextTokenParser_Success(t *testing.T) {
 	}
 }
 
+func TestMainContextTokenParser_EscapedValueToken_Success(t *testing.T) {
+	b := NewBuilder([]byte("\\[qwerty"))
+	token, err := b.getNextTokenInMainContext()
+
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	if token.Type != typeLetter {
+		t.Fatalf("Expected type letter, got: %d", token.Type)
+	}
+
+	if token.Length != 2 {
+		t.Fatalf("Expected length 2, got: %d", token.Length)
+	}
+
+	if string(token.Stream) != "[" {
+		t.Fatalf("Expected '%s', got '%s'", "[", string(token.Stream))
+	}
+}
