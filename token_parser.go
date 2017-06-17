@@ -52,7 +52,7 @@ func (b *Builder) getNextToken() (*Token, error) {
 
 func (b *Builder) getNextTokenInMainContext() (*Token, error) {
 	token := Token{Type: typeInvalid, Length: 0}
-	token.Stream = make([]byte, 1)
+	token.Stream = make([]byte, 0, 1)
 	curPosition := b.Position
 	escape := false
 
@@ -79,6 +79,7 @@ func (b *Builder) getNextTokenInMainContext() (*Token, error) {
 		} else if letter == tokenBraceOpen || letter == tokenBracketOpen || letter == tokenParenthesisOpen {
 			token.Type = typeBracketOpen
 			token.Stream = append(token.Stream, letter)
+			break
 		} else {
 			token.Stream = append(token.Stream, letter)
 			token.Type = typeLetter
