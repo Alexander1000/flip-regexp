@@ -45,3 +45,7 @@ func TestMainContextTokenParser_EscapedValueToken_Success(t *testing.T) {
 		t.Fatalf("Expected '%s', got '%s'", "[", string(token.Stream))
 	}
 }
+
+func TestMainContextTokenParser_Data_Success(t *testing.T) {
+	// todo описать с помощью dataProvider test-case-ы из 2х тестов выше и дополнить их
+}
