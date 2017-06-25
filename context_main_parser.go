@@ -31,7 +31,7 @@ func (c *MainContext) getNextToken() (*Token, error) {
 			token.Stream = append(token.Stream, letter)
 			break
 		} else if letter == tokenParenthesisOpen || letter == tokenBracketOpen {
-			token.Type = typeGroup
+			token.Type = typeGroupOpen
 			token.Stream = append(token.Stream, letter)
 			break
 		} else {

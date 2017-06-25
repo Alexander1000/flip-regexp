@@ -21,17 +21,15 @@ const (
 )
 
 type Builder struct {
-	Pattern       []byte
-	Position      int
-	Result        []byte
+	Pattern  []byte
+	Position int
+	Result   []byte
 	// переключатель контекста
 	ContextParser int
-	// позиция начала контекста
-	ContextStartPosition int
 }
 
 func NewBuilder(pattern []byte) *Builder {
-	return &Builder{Pattern: pattern, Position: 0, ContextParser: contextMain, ContextStartPosition: 0}
+	return &Builder{Pattern: pattern, Position: 0, ContextParser: contextMain}
 }
 
 func (b *Builder) randInt(min, max int) int {

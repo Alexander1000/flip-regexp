@@ -1,7 +1,7 @@
 package flip_regexp
 
 const (
-	contextMain = 0
+	contextMain    = 0
 	contextBracket = 1
 
 	tokenEscape           = byte(0x5C) // \
@@ -31,10 +31,12 @@ const (
 
 	typeInvalid    = 0
 	typeLetter     = 1
-	typeGroup      = 2
-	typeQuantifier = 3
-	typeAlias      = 4
-	typeCircumflex = 5
+	typeGroupOpen  = 2
+	typeGroupClose = 3
+	typeQuantifier = 4
+	typeAlias      = 5
+	typeCircumflex = 6
+	typeInterval   = 7
 )
 
 type Token struct {
@@ -52,8 +54,7 @@ func (b *Builder) getNextToken() (*Token, error) {
 		context := &MainContext{Builder: b}
 		return context.getNextToken()
 	} else if b.ContextParser == contextBracket {
-		context := &BracketContext{Builder: b}
-		return context.getNextToken()
+		return b.newBracketContext().getNextToken()
 	}
 
 	return nil, nil

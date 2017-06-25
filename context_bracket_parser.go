@@ -1,7 +1,13 @@
 package flip_regexp
 
 type BracketContext struct {
-	Builder *Builder
+	Builder       *Builder
+	StartPosition int
+	OpenBracket   bool
+}
+
+func (b *Builder) newBracketContext() *BracketContext {
+	return &BracketContext{Builder: b, StartPosition: b.Position, OpenBracket: true}
 }
 
 func (bc *BracketContext) getNextToken() (*Token, error) {
@@ -9,7 +15,7 @@ func (bc *BracketContext) getNextToken() (*Token, error) {
 	token.Stream = make([]byte, 0, 1)
 	curPosition := bc.Builder.Position
 	escape := false
-	first := curPosition == bc.Builder.ContextStartPosition
+	first := curPosition == bc.StartPosition
 
 	for curPosition < len(bc.Builder.Pattern) {
 		letter := bc.Builder.getSymbolByRelativeOffset(token.Length)
@@ -29,6 +35,11 @@ func (bc *BracketContext) getNextToken() (*Token, error) {
 			break
 		} else if first && letter == tokenCircumflex {
 			token.Type = typeCircumflex
+			token.Stream = append(token.Stream, letter)
+			break
+		} else if bc.OpenBracket && letter == tokenBracketClose {
+			bc.OpenBracket = false
+			token.Type = typeGroupClose
 			token.Stream = append(token.Stream, letter)
 			break
 		} else {

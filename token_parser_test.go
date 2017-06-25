@@ -29,9 +29,9 @@ func testTokenParserInMainContext(t *testing.T, context int, pattern string, tok
 func TestMainContextTokenParser_Data_Success(t *testing.T) {
 	dataProvider := []interface{}{
 		// parser in main context
-		[]interface{}{contextMain, "[", typeGroup, 1, "["},
+		[]interface{}{contextMain, "[", typeGroupOpen, 1, "["},
 		[]interface{}{contextMain, "\\[", typeLetter, 2, "["},
-		[]interface{}{contextMain, "(", typeGroup, 1, "("},
+		[]interface{}{contextMain, "(", typeGroupOpen, 1, "("},
 		[]interface{}{contextMain, "\\d", typeAlias, 2, "d"},
 		[]interface{}{contextMain, "\\w", typeAlias, 2, "w"},
 		[]interface{}{contextMain, "\\s", typeAlias, 2, "s"},
