@@ -27,8 +27,9 @@ func testTokenParserInMainContext(t *testing.T, pattern string, tokenType, token
 
 func TestMainContextTokenParser_Data_Success(t *testing.T) {
 	dataProvider := []interface{}{
-		[]interface{}{"[qwerty]", typeBracketOpen, 1, "["},
+		[]interface{}{"[qwerty]", typeGroup, 1, "["},
 		[]interface{}{"\\[qwerty", typeLetter, 2, "["},
+		[]interface{}{"(qwerty)", typeGroup, 1, "("},
 	}
 
 	for _, row := range dataProvider {
