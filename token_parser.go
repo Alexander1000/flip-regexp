@@ -20,13 +20,13 @@ const (
 	tokenAsterisk         = byte(0x2A) // *
 	tokenCircumflex       = byte(0x5E) // ^
 
-	tokenDigit = byte(0x64) // d
-	tokenWord  = byte(0x77) // w
-	tokenSpace = byte(0x73) // s
+	aliasTokenDigit = byte(0x64) // d
+	aliasTokenWord  = byte(0x77) // w
+	aliasTokenSpace = byte(0x73) // s
 
-	tokenNotDigit = byte(0x44) // D
-	tokenNotWord  = byte(0x57) // W
-	tokenNotSpace = byte(0x53) // S
+	aliasTokenNotDigit = byte(0x44) // D
+	aliasTokenNotWord  = byte(0x57) // W
+	aliasTokenNotSpace = byte(0x53) // S
 
 	typeInvalid    = 0
 	typeLetter     = 1
@@ -90,7 +90,12 @@ func (b *Builder) getNextTokenInMainContext() (*Token, error) {
 }
 
 func (b *Builder) isAlias(letter byte) bool {
-	return letter == tokenDigit || letter == tokenNotDigit || letter == tokenWord || letter == tokenNotWord || letter == tokenSpace || letter == tokenNotSpace
+	return letter == aliasTokenDigit ||
+		letter == aliasTokenNotDigit ||
+		letter == aliasTokenWord ||
+		letter == aliasTokenNotWord ||
+		letter == aliasTokenSpace ||
+		letter == aliasTokenNotSpace
 }
 
 func (b *Builder) getSymbolByRelativeOffset(position int) byte {
