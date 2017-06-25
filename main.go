@@ -25,10 +25,11 @@ type Builder struct {
 	Position      int
 	Result        []byte
 	ContextParser int
+	ContextStartPosition int
 }
 
 func NewBuilder(pattern []byte) *Builder {
-	return &Builder{Pattern: pattern, Position: 0, ContextParser: contextMain}
+	return &Builder{Pattern: pattern, Position: 0, ContextParser: contextMain, ContextStartPosition: 0}
 }
 
 func (b *Builder) randInt(min, max int) int {

@@ -34,6 +34,7 @@ const (
 	typeGroup      = 2
 	typeQuantifier = 3
 	typeAlias      = 4
+	typeCircumflex = 5
 )
 
 type Token struct {
@@ -97,6 +98,7 @@ func (b *Builder) getNextTokenInBracketContext() (*Token, error) {
 	token.Stream = make([]byte, 0, 1)
 	curPosition := b.Position
 	escape := false
+	first := curPosition == b.ContextStartPosition
 
 	for curPosition < len(b.Pattern) {
 		letter := b.getSymbolByRelativeOffset(token.Length)
@@ -105,6 +107,19 @@ func (b *Builder) getNextTokenInBracketContext() (*Token, error) {
 
 		if !escape && letter == tokenEscape {
 			escape = true
+		} else if escape {
+			if b.isAlias(letter) {
+				token.Type = typeAlias
+			} else {
+				token.Type = typeLetter
+			}
+
+			token.Stream = append(token.Stream, letter)
+			break
+		} else if first && letter == tokenCircumflex {
+			token.Type = typeCircumflex
+			token.Stream = append(token.Stream, letter)
+			break
 		}
 	}
 

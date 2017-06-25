@@ -28,6 +28,7 @@ func testTokenParserInMainContext(t *testing.T, context int, pattern string, tok
 
 func TestMainContextTokenParser_Data_Success(t *testing.T) {
 	dataProvider := []interface{}{
+		// parser in main context
 		[]interface{}{contextMain, "[", typeGroup, 1, "["},
 		[]interface{}{contextMain, "\\[", typeLetter, 2, "["},
 		[]interface{}{contextMain, "(", typeGroup, 1, "("},
@@ -41,7 +42,16 @@ func TestMainContextTokenParser_Data_Success(t *testing.T) {
 		[]interface{}{contextMain, "+", typeQuantifier, 1, "+"},
 		[]interface{}{contextMain, "*", typeQuantifier, 1, "*"},
 		[]interface{}{contextMain, "a", typeLetter, 1, "a"},
+		[]interface{}{contextMain, "^", typeLetter, 1, "^"},
 		[]interface{}{contextMain, "", typeInvalid, 0, ""},
+		// parser in bracket context
+		[]interface{}{contextBracket, "\\d", typeAlias, 2, "d"},
+		[]interface{}{contextBracket, "\\w", typeAlias, 2, "w"},
+		[]interface{}{contextBracket, "\\s", typeAlias, 2, "s"},
+		[]interface{}{contextBracket, "\\D", typeAlias, 2, "D"},
+		[]interface{}{contextBracket, "\\W", typeAlias, 2, "W"},
+		[]interface{}{contextBracket, "\\S", typeAlias, 2, "S"},
+		[]interface{}{contextBracket, "^", typeCircumflex, 1, "^"},
 	}
 
 	for _, row := range dataProvider {
