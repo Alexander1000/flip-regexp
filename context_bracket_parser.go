@@ -27,30 +27,34 @@ func (bc *BracketContext) getNextToken() (*Token, error) {
 		curPosition++
 		token.Length++
 
-		if !escape && letter == tokenEscape {
-			escape = true
-		} else if escape {
-			if bc.Builder.isAlias(letter) {
-				token.Type = typeAlias
-			} else {
-				token.Type = typeLetter
-			}
+		if bc.OpenBracket {
+			if !escape && letter == tokenEscape {
+				escape = true
+			} else if escape {
+				if bc.Builder.isAlias(letter) {
+					token.Type = typeAlias
+				} else {
+					token.Type = typeLetter
+				}
 
-			token.Stream = append(token.Stream, letter)
-			break
-		} else if first && letter == tokenCircumflex {
-			token.Type = typeCircumflex
-			token.Stream = append(token.Stream, letter)
-			break
-		} else if bc.OpenBracket && letter == tokenBracketClose {
-			bc.OpenBracket = false
-			token.Type = typeGroupClose
-			token.Stream = append(token.Stream, letter)
-			break
+				token.Stream = append(token.Stream, letter)
+				break
+			} else if first && letter == tokenCircumflex {
+				token.Type = typeCircumflex
+				token.Stream = append(token.Stream, letter)
+				break
+			} else if bc.OpenBracket && letter == tokenBracketClose {
+				bc.OpenBracket = false
+				token.Type = typeGroupClose
+				token.Stream = append(token.Stream, letter)
+				break
+			} else {
+				token.Stream = append(token.Stream, letter)
+				token.Type = typeLetter
+				break
+			}
 		} else {
-			token.Stream = append(token.Stream, letter)
-			token.Type = typeLetter
-			break
+			// todo: check quantifires (+, *, ?) and check {n,m}
 		}
 	}
 
