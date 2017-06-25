@@ -28,7 +28,7 @@ type Builder struct {
 }
 
 func NewBuilder(pattern []byte) *Builder {
-	return &Builder{Pattern: pattern, Position: 0, ContextParser: mainContext}
+	return &Builder{Pattern: pattern, Position: 0, ContextParser: contextMain}
 }
 
 func (b *Builder) randInt(min, max int) int {

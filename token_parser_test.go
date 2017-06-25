@@ -4,9 +4,10 @@ import (
 	"testing"
 )
 
-func testTokenParserInMainContext(t *testing.T, pattern string, tokenType, tokenLength int, strExpectedToken string) {
+func testTokenParserInMainContext(t *testing.T, context int, pattern string, tokenType, tokenLength int, strExpectedToken string) {
 	b := NewBuilder([]byte(pattern))
-	token, err := b.getNextTokenInMainContext()
+	b.ContextParser = context
+	token, err := b.getNextToken()
 
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -27,24 +28,24 @@ func testTokenParserInMainContext(t *testing.T, pattern string, tokenType, token
 
 func TestMainContextTokenParser_Data_Success(t *testing.T) {
 	dataProvider := []interface{}{
-		[]interface{}{"[", typeGroup, 1, "["},
-		[]interface{}{"\\[", typeLetter, 2, "["},
-		[]interface{}{"(", typeGroup, 1, "("},
-		[]interface{}{"\\d", typeAlias, 2, "d"},
-		[]interface{}{"\\w", typeAlias, 2, "w"},
-		[]interface{}{"\\s", typeAlias, 2, "s"},
-		[]interface{}{"\\D", typeAlias, 2, "D"},
-		[]interface{}{"\\W", typeAlias, 2, "W"},
-		[]interface{}{"\\S", typeAlias, 2, "S"},
-		[]interface{}{"?", typeQuantifier, 1, "?"},
-		[]interface{}{"+", typeQuantifier, 1, "+"},
-		[]interface{}{"*", typeQuantifier, 1, "*"},
-		[]interface{}{"a", typeLetter, 1, "a"},
-		[]interface{}{"", typeInvalid, 0, ""},
+		[]interface{}{contextMain, "[", typeGroup, 1, "["},
+		[]interface{}{contextMain, "\\[", typeLetter, 2, "["},
+		[]interface{}{contextMain, "(", typeGroup, 1, "("},
+		[]interface{}{contextMain, "\\d", typeAlias, 2, "d"},
+		[]interface{}{contextMain, "\\w", typeAlias, 2, "w"},
+		[]interface{}{contextMain, "\\s", typeAlias, 2, "s"},
+		[]interface{}{contextMain, "\\D", typeAlias, 2, "D"},
+		[]interface{}{contextMain, "\\W", typeAlias, 2, "W"},
+		[]interface{}{contextMain, "\\S", typeAlias, 2, "S"},
+		[]interface{}{contextMain, "?", typeQuantifier, 1, "?"},
+		[]interface{}{contextMain, "+", typeQuantifier, 1, "+"},
+		[]interface{}{contextMain, "*", typeQuantifier, 1, "*"},
+		[]interface{}{contextMain, "a", typeLetter, 1, "a"},
+		[]interface{}{contextMain, "", typeInvalid, 0, ""},
 	}
 
 	for _, row := range dataProvider {
 		data := row.([]interface{})
-		testTokenParserInMainContext(t, data[0].(string), data[1].(int), data[2].(int), data[3].(string))
+		testTokenParserInMainContext(t, data[0].(int), data[1].(string), data[2].(int), data[3].(int), data[4].(string))
 	}
 }

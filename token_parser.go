@@ -1,7 +1,8 @@
 package flip_regexp
 
 const (
-	mainContext = 0
+	contextMain = 0
+	contextBracket = 1
 
 	tokenEscape           = byte(0x5C) // \
 	tokenBracketOpen      = byte(0x5B) // [
@@ -42,8 +43,10 @@ type Token struct {
 }
 
 func (b *Builder) getNextToken() (*Token, error) {
-	if b.ContextParser == mainContext {
+	if b.ContextParser == contextMain {
 		return b.getNextTokenInMainContext()
+	} else if b.ContextParser == contextBracket {
+		return b.getNextTokenInBracketContext()
 	}
 
 	return nil, nil
@@ -83,6 +86,25 @@ func (b *Builder) getNextTokenInMainContext() (*Token, error) {
 			token.Stream = append(token.Stream, letter)
 			token.Type = typeLetter
 			break
+		}
+	}
+
+	return &token, nil
+}
+
+func (b *Builder) getNextTokenInBracketContext() (*Token, error) {
+	token := Token{Type: typeInvalid, Length: 0}
+	token.Stream = make([]byte, 0, 1)
+	curPosition := b.Position
+	escape := false
+
+	for curPosition < len(b.Pattern) {
+		letter := b.getSymbolByRelativeOffset(token.Length)
+		curPosition++
+		token.Length++
+
+		if !escape && letter == tokenEscape {
+			escape = true
 		}
 	}
 
