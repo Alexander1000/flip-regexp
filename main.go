@@ -26,10 +26,14 @@ type Builder struct {
 	Result   []byte
 	// переключатель контекста
 	ContextParser int
+	mainContext *MainContext
+	bracketContext *BracketContext
 }
 
 func NewBuilder(pattern []byte) *Builder {
-	return &Builder{Pattern: pattern, Position: 0, ContextParser: contextMain}
+	builder := &Builder{Pattern: pattern, Position: 0, ContextParser: contextMain}
+	builder.mainContext = &MainContext{Builder: builder}
+	return builder
 }
 
 func (b *Builder) randInt(min, max int) int {

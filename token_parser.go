@@ -54,7 +54,7 @@ func (b *Builder) getNextToken() (*Token, error) {
 		context := &MainContext{Builder: b}
 		return context.getNextToken()
 	} else if b.ContextParser == contextBracket {
-		return b.newBracketContext().getNextToken()
+		return b.getBracketContext().getNextToken()
 	}
 
 	return nil, nil

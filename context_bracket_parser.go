@@ -6,8 +6,13 @@ type BracketContext struct {
 	OpenBracket   bool
 }
 
-func (b *Builder) newBracketContext() *BracketContext {
-	return &BracketContext{Builder: b, StartPosition: b.Position, OpenBracket: true}
+func (b *Builder) getBracketContext() *BracketContext {
+	if b.bracketContext != nil {
+		return b.bracketContext
+	}
+
+	b.bracketContext = &BracketContext{Builder: b, StartPosition: b.Position, OpenBracket: true}
+	return b.bracketContext
 }
 
 func (bc *BracketContext) getNextToken() (*Token, error) {
