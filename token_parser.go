@@ -43,87 +43,20 @@ type Token struct {
 	Type   int
 }
 
+type Context interface {
+	getNextToken() (*Token, error)
+}
+
 func (b *Builder) getNextToken() (*Token, error) {
 	if b.ContextParser == contextMain {
-		return b.getNextTokenInMainContext()
+		context := &MainContext{Builder: b}
+		return context.getNextToken()
 	} else if b.ContextParser == contextBracket {
-		return b.getNextTokenInBracketContext()
+		context := &BracketContext{Builder: b}
+		return context.getNextToken()
 	}
 
 	return nil, nil
-}
-
-func (b *Builder) getNextTokenInMainContext() (*Token, error) {
-	token := Token{Type: typeInvalid, Length: 0}
-	token.Stream = make([]byte, 0, 1)
-	curPosition := b.Position
-	escape := false
-
-	for curPosition < len(b.Pattern) {
-		letter := b.getSymbolByRelativeOffset(token.Length)
-		curPosition++
-		token.Length++
-
-		if !escape && letter == tokenEscape {
-			escape = true
-		} else if escape {
-			if b.isAlias(letter) {
-				token.Type = typeAlias
-			} else {
-				token.Type = typeLetter
-			}
-
-			token.Stream = append(token.Stream, letter)
-			break
-		} else if b.isQuantifier(letter) {
-			token.Type = typeQuantifier
-			token.Stream = append(token.Stream, letter)
-			break
-		} else if letter == tokenParenthesisOpen || letter == tokenBracketOpen {
-			token.Type = typeGroup
-			token.Stream = append(token.Stream, letter)
-			break
-		} else {
-			token.Stream = append(token.Stream, letter)
-			token.Type = typeLetter
-			break
-		}
-	}
-
-	return &token, nil
-}
-
-func (b *Builder) getNextTokenInBracketContext() (*Token, error) {
-	token := Token{Type: typeInvalid, Length: 0}
-	token.Stream = make([]byte, 0, 1)
-	curPosition := b.Position
-	escape := false
-	first := curPosition == b.ContextStartPosition
-
-	for curPosition < len(b.Pattern) {
-		letter := b.getSymbolByRelativeOffset(token.Length)
-		curPosition++
-		token.Length++
-
-		if !escape && letter == tokenEscape {
-			escape = true
-		} else if escape {
-			if b.isAlias(letter) {
-				token.Type = typeAlias
-			} else {
-				token.Type = typeLetter
-			}
-
-			token.Stream = append(token.Stream, letter)
-			break
-		} else if first && letter == tokenCircumflex {
-			token.Type = typeCircumflex
-			token.Stream = append(token.Stream, letter)
-			break
-		}
-	}
-
-	return &token, nil
 }
 
 func (b *Builder) isAlias(letter byte) bool {

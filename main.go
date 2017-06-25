@@ -24,7 +24,9 @@ type Builder struct {
 	Pattern       []byte
 	Position      int
 	Result        []byte
+	// переключатель контекста
 	ContextParser int
+	// позиция начала контекста
 	ContextStartPosition int
 }
 
