@@ -36,6 +36,9 @@ func TestMainContextTokenParser_Data_Success(t *testing.T) {
 		[]interface{}{"\\D+", typeAlias, 2, "D"},
 		[]interface{}{"\\W+", typeAlias, 2, "W"},
 		[]interface{}{"\\S+", typeAlias, 2, "S"},
+		[]interface{}{"?", typeQuantifier, 1, "?"},
+		[]interface{}{"+", typeQuantifier, 1, "+"},
+		[]interface{}{"*", typeQuantifier, 1, "*"},
 	}
 
 	for _, row := range dataProvider {
