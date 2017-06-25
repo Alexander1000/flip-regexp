@@ -40,6 +40,7 @@ func TestMainContextTokenParser_Data_Success(t *testing.T) {
 		[]interface{}{"+", typeQuantifier, 1, "+"},
 		[]interface{}{"*", typeQuantifier, 1, "*"},
 		[]interface{}{"a", typeLetter, 1, "a"},
+		[]interface{}{"", typeInvalid, 0, ""},
 	}
 
 	for _, row := range dataProvider {
