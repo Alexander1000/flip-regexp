@@ -27,18 +27,19 @@ func testTokenParserInMainContext(t *testing.T, pattern string, tokenType, token
 
 func TestMainContextTokenParser_Data_Success(t *testing.T) {
 	dataProvider := []interface{}{
-		[]interface{}{"[qwerty]", typeGroup, 1, "["},
-		[]interface{}{"\\[qwerty", typeLetter, 2, "["},
-		[]interface{}{"(qwerty)", typeGroup, 1, "("},
-		[]interface{}{"\\d+", typeAlias, 2, "d"},
-		[]interface{}{"\\w+", typeAlias, 2, "w"},
-		[]interface{}{"\\s+", typeAlias, 2, "s"},
-		[]interface{}{"\\D+", typeAlias, 2, "D"},
-		[]interface{}{"\\W+", typeAlias, 2, "W"},
-		[]interface{}{"\\S+", typeAlias, 2, "S"},
+		[]interface{}{"[", typeGroup, 1, "["},
+		[]interface{}{"\\[", typeLetter, 2, "["},
+		[]interface{}{"(", typeGroup, 1, "("},
+		[]interface{}{"\\d", typeAlias, 2, "d"},
+		[]interface{}{"\\w", typeAlias, 2, "w"},
+		[]interface{}{"\\s", typeAlias, 2, "s"},
+		[]interface{}{"\\D", typeAlias, 2, "D"},
+		[]interface{}{"\\W", typeAlias, 2, "W"},
+		[]interface{}{"\\S", typeAlias, 2, "S"},
 		[]interface{}{"?", typeQuantifier, 1, "?"},
 		[]interface{}{"+", typeQuantifier, 1, "+"},
 		[]interface{}{"*", typeQuantifier, 1, "*"},
+		[]interface{}{"a", typeLetter, 1, "a"},
 	}
 
 	for _, row := range dataProvider {
