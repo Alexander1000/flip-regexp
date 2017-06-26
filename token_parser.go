@@ -37,6 +37,11 @@ const (
 	typeAlias      = 5
 	typeCircumflex = 6
 	typeInterval   = 7
+	// {n,m}
+	typeQuantifierOpen = 8
+	typeQuantifierClose = 9
+	typeQuantifierSize = 10
+	typeQuantifierComma = 11
 )
 
 type Token struct {
