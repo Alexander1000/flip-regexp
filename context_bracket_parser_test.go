@@ -66,6 +66,13 @@ func TestGetToken_ContextBracketParser_SimpleIntervalWithSizeMinMax_Success(t *t
 	if token.Max != 6 {
 		t.Fatalf("Unexpected max size, got %v", token.Max)
 	}
+
+	b.Position += token.Length
+	token, err = b.getNextToken()
+
+	if token.Type != typeInvalid {
+		t.Fatalf("Unexpected token type, got: %v", token.Type)
+	}
 }
 
 func TestGetToken_ContextBracketParser_SimpleIntervalWithSizeEmptyMinMax_Success(t *testing.T) {
@@ -130,6 +137,13 @@ func TestGetToken_ContextBracketParser_SimpleIntervalWithSizeEmptyMinMax_Success
 	if token.Max != 6 {
 		t.Fatalf("Unexpected max size, got %v", token.Max)
 	}
+
+	b.Position += token.Length
+	token, err = b.getNextToken()
+
+	if token.Type != typeInvalid {
+		t.Fatalf("Unexpected token type, got: %v", token.Type)
+	}
 }
 
 func TestGetToken_ContextBracketParser_SimpleIntervalWithSizeOnlyMax_Success(t *testing.T) {
@@ -193,5 +207,12 @@ func TestGetToken_ContextBracketParser_SimpleIntervalWithSizeOnlyMax_Success(t *
 
 	if token.Max != 9 {
 		t.Fatalf("Unexpected max size, got %v", token.Max)
+	}
+
+	b.Position += token.Length
+	token, err = b.getNextToken()
+
+	if token.Type != typeInvalid {
+		t.Fatalf("Unexpected token type, got: %v", token.Type)
 	}
 }
