@@ -48,6 +48,12 @@ type Token struct {
 	Length int
 	Stream []byte
 	Type   int
+	Min int
+	Max int
+}
+
+func (t *Token) Render() []byte {
+	return t.Stream
 }
 
 type Context interface {
