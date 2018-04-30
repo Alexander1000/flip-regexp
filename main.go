@@ -28,11 +28,13 @@ type Builder struct {
 	ContextParser int
 	mainContext *MainContext
 	bracketContext *BracketContext
+	contextList []Context
 }
 
 func NewBuilder(pattern []byte) *Builder {
 	builder := &Builder{Pattern: pattern, Position: 0, ContextParser: contextMain}
 	builder.mainContext = &MainContext{Builder: builder}
+	builder.contextList = make([]Context, 0, 10)
 	return builder
 }
 
@@ -43,6 +45,37 @@ func (b *Builder) randInt(min, max int) int {
 
 	rand.Seed(time.Now().UnixNano())
 	return min + rand.Intn(max-min)
+}
+
+func (b *Builder) Build() error {
+	b.Result = make([]byte, 0, 10)
+
+	context := NewMainContext(b)
+	b.contextList = append(b.contextList, context)
+
+	for b.Position < len(b.Pattern) {
+		token, err := context.getNextToken()
+		if err != nil {
+			return nil
+		}
+		if token.Type == typeParenthesisOpen {
+			// @todo make new context
+		} else if token.Type == typeBracketOpen {
+			// @todo make new context
+		} else if token.Type == typeBraceOpen {
+			// @todo make new context
+		}
+	}
+
+	return nil
+}
+
+func (b *Builder) RenderResult() string {
+	result := ""
+	for _, context := range b.contextList {
+		result = result + context.render()
+	}
+	return result
 }
 
 func (b *Builder) Render() ([]byte, error) {

@@ -37,6 +37,9 @@ const (
 	typeAlias      = 5
 	typeCircumflex = 6
 	typeInterval   = 7
+	typeParenthesisOpen = 8
+	typeBracketOpen = 9
+	typeBraceOpen = 10
 	// {n,m}
 	typeQuantifierOpen = 8
 	typeQuantifierClose = 9
@@ -58,6 +61,7 @@ func (t *Token) Render() []byte {
 
 type Context interface {
 	getNextToken() (*Token, error)
+	render() string
 }
 
 func (b *Builder) getNextToken() (*Token, error) {
