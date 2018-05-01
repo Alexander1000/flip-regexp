@@ -56,17 +56,15 @@ func (c *MainContext) getNextToken() (*Token, error) {
 func (c *MainContext) render() string {
 	printResult := make([]string, 0)
 	result := ""
-	prev := ""
 	isLetter := false
 	isAlias := false
-	aliasType := byte(0)
+	// aliasType := byte(0)
 	aliasAbc := ""
 	for _, token := range c.TokenList {
 		tokenStream := token.Render()
 
 		if token.Type == typeLetter {
 			result += string(tokenStream)
-			prev = string(tokenStream)
 			isLetter = true
 			isAlias = false
 		} else if token.Type == typeQuantifier {
@@ -125,25 +123,31 @@ func (c *MainContext) render() string {
 			isAlias = true
 
 			if tokenStream[1] == aliasTokenDigit {
-				aliasType = aliasTokenDigit
+				// aliasType = aliasTokenDigit
 				aliasAbc = "0123456789"
 			} else if tokenStream[1] == aliasTokenNotDigit {
-				aliasType = aliasTokenNotDigit
+				// aliasType = aliasTokenNotDigit
 				aliasAbc = "0123456789qwertyuiopasdfghjklzxcvbnm "
 			} else if tokenStream[1] == aliasTokenNotSpace {
-				aliasType = aliasTokenNotSpace
+				// aliasType = aliasTokenNotSpace
 				aliasAbc = "0123456789qwertyuiopasdfghjklzxcvbnm"
 			} else if tokenStream[1] == aliasTokenSpace {
-				aliasType = aliasTokenSpace
+				// aliasType = aliasTokenSpace
 				aliasAbc = " "
 			} else if tokenStream[1] == aliasTokenWord {
-				aliasType = aliasTokenWord
+				// aliasType = aliasTokenWord
 				aliasAbc = "qwertyuiopasdfghjklzxcvbnm"
 			} else if tokenStream[1] == aliasTokenNotWord {
-				aliasType = aliasTokenNotWord
+				// aliasType = aliasTokenNotWord
 				aliasAbc = "0123456789"
 			}
 		}
 	}
+
+	result = ""
+	for _, str := range printResult {
+		result += str
+	}
+
 	return result
 }
